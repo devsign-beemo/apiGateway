@@ -1,0 +1,36 @@
+server:
+  port: 10010
+---
+# -- Eureka client
+eureka:
+  client:
+    fetch-registry: true # 유레카 클라이언트 활성화
+    register-with-eureka: true # 유레카 클라이언트 활성화
+    serviceUrl:
+      defaultZone: ${EUREKA_URL:http://127.0.0.1:10000/eureka/}
+  instance:
+    hostname: localhost
+---
+
+spring:
+  application:
+    name: apiGateway
+  cloud:
+    gateway:
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: Spring Cloud Gateway GlobalFilter
+            preLogger: true
+            postLogger: true
+      routes:
+        - id: riderService
+          uri: lb://RIDERSERVICE
+          predicates:
+            - Path=/rider/**
+          filters:
+            - name: GlobalFilter
+              args:
+                baseMessage: Spring Cloud Gateway riderFilter
+                preLogger: true
+                postLogger: true
